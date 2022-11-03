@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Typography } from "@mui/material";
-
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 function QuizPage() {
   const questions = [
     {
@@ -56,6 +56,44 @@ function QuizPage() {
   const [mins, setMinutes] = useState(0);
   const [secs, setSeconds] = useState(0);
   const [hrs, setHours] = useState(0);
+  const [arr, setArr] = useState([]);
+  const initialValue = 0;
+  
+  const handleAnswerButtonClick = (isCorrect) => {
+    const nwarray = [...arr];
+    if (isCorrect === true) {
+      nwarray.push(1);
+    }
+    else{
+      nwarray.push(0);
+    }
+    setArr(nwarray);
+    const nextQuetions = currentQuestion + 1;
+
+    if (nextQuetions < questions.length) {
+      setCurrentQuestion(nextQuetions);
+    } else {
+      setShowScore(true);
+      let sum = nwarray.reduce((totalValue, currentValue) => totalValue + currentValue, initialValue);
+      setScore(sum);
+    }
+  };
+
+  const goBack = () => {
+    const nwarray = [...arr];
+    nwarray.pop();
+    setArr(nwarray);
+    const nextQuetions = currentQuestion - 1;
+    if (nextQuetions < questions.length) {
+      setCurrentQuestion(nextQuetions);
+    } else {
+      setShowScore(true);
+    }
+  }
+  const reStart = () =>{
+    window.location.reload();
+  }
+
   useEffect(() => {
     let sampleInterval = setInterval(() => {
       if (secs >= 0 && showScore === false) {
@@ -75,23 +113,6 @@ function QuizPage() {
       clearInterval(sampleInterval);
     };
   });
-  const handleAnswerButtonClick = (isCorrect) => {
-    if (isCorrect === true) {
-      setScore(score + 1);
-    }
-
-    const nextQuetions = currentQuestion + 1;
-
-    if (nextQuetions < questions.length) {
-      setCurrentQuestion(nextQuetions);
-    } else {
-      setShowScore(true);
-    }
-  };
-
-  const reStart = () =>{
-    window.location.reload();
-  }
   return (
     <>
       <Box className="app">
@@ -209,7 +230,7 @@ function QuizPage() {
                 }}
               >
                 {questions[currentQuestion].answerOptions.map(
-                  (answerOptions) => (
+                  (answerOptions,index) => (
                     <Button
                       variant="contained"
                       sx={{
@@ -217,6 +238,7 @@ function QuizPage() {
                         justifyContent: "space-between",
                         margin: "5px",
                       }}
+                      key={index}
                       onClick={() =>
                         handleAnswerButtonClick(answerOptions.isCorrect)
                       }
@@ -226,6 +248,11 @@ function QuizPage() {
                   )
                 )}
               </Box>
+              {currentQuestion > 0 && !showScore ? 
+              <Box sx={{backgroundColor: "#000", width: "50px", height: "30px", borderRadius: "6px", cursor: "pointer"}} onClick={()=>goBack()}>
+                  <ArrowBackIcon sx={{color:"#fff", margin: "auto", marginLeft: "10px", marginTop: "3px"}}/>
+              </Box> 
+              : ""}
             </Box>
           </>
         )}
